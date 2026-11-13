@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Pokédex QR · Kanto</title>
+  <meta name="description" content="Pokédex de Kanto: encuentra códigos QR, captura a los 151 Pokémon y guarda tu colección en tu dispositivo.">
+  <meta name="theme-color" content="#c4161c">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Pokédex">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="preload" href="fonts/press-start-2p-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <noscript>Esta Pokédex necesita JavaScript para funcionar.</noscript>
+
+  <div id="app" class="shell" data-capa="0">
+
+    <!-- Cuerpo de la pokédex -->
+    <div id="fondo" class="fondo">
+
+      <header class="top">
+        <div id="lente-top" class="lens lens--on" aria-hidden="true"><span class="lens__glass"></span></div>
+        <div class="leds" aria-hidden="true">
+          <i class="led led--red"></i><i class="led led--yellow"></i><i class="led led--green"></i>
+        </div>
+        <div class="top__titulo">
+          <h1 class="font-pixel">POKÉDEX</h1>
+          <p id="estado-red" class="net net--on" role="status">● EN LÍNEA</p>
+        </div>
+        <div class="top__corte" aria-hidden="true"></div>
+      </header>
+
+      <main class="bezel">
+        <div id="lcd" class="lcd">
+
+          <!-- Vista 1: Mi Pokédex -->
+          <section id="vista-pokedex" class="vista" aria-label="Mi Pokédex">
+            <div class="vista__head">
+              <div class="flex items-end justify-between gap-2">
+                <h2 class="lcd-titulo font-pixel">MI POKÉDEX</h2>
+                <p class="contador" aria-live="polite"><span id="contador">000</span><span class="contador__total">/151</span></p>
+              </div>
+              <label class="buscador mt-2">
+                <span class="sr-only">Buscar Pokémon por nombre o número</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="M15 15l6 6"/></svg>
+                <input id="buscar" type="search" placeholder="Buscar nombre o número" autocomplete="off" enterkeyhint="search">
+              </label>
+              <div class="chips mt-2" role="group" aria-label="Filtrar colección">
+                <button class="chip is-on" data-filtro="capturados" aria-pressed="true">Capturados</button>
+                <button class="chip" data-filtro="todos" aria-pressed="false">Los 151</button>
+                <button class="chip" data-filtro="faltan" aria-pressed="false">Faltan</button>
+              </div>
+            </div>
+            <div id="pokedex-contenido"></div>
+          </section>
+
+          <!-- Vista 2: Progreso -->
+          <section id="vista-progreso" class="vista" aria-label="Progreso" hidden>
+            <div class="vista__head">
+              <h2 class="lcd-titulo font-pixel">PROGRESO</h2>
+            </div>
+            <div class="flex flex-col gap-4 p-3">
+              <div class="panel">
+                <p class="etiqueta">Pokémon capturados</p>
+                <p class="big"><span id="prog-cap">0</span><small> / 151</small></p>
+                <p class="etiqueta mt-3">Porcentaje completado</p>
+                <p class="big big--chico" id="prog-pct">0 %</p>
+                <div id="prog-barra" class="barra mt-3" role="progressbar" aria-label="Progreso de la Pokédex" aria-valuemin="0" aria-valuemax="151" aria-valuenow="0">
+                  <div id="prog-relleno" class="barra__relleno"></div>
+                  <div class="barra__segmentos"></div>
+                </div>
+                <p id="prog-texto" class="mt-2 texto-lcd"></p>
+              </div>
+
+              <div class="panel">
+                <h3 class="subtitulo font-pixel">MEDALLAS DE KANTO</h3>
+                <div id="medallas" class="medallas mt-3"></div>
+              </div>
+
+              <div class="panel">
+                <h3 class="subtitulo font-pixel">POR TIPO</h3>
+                <div id="por-tipo" class="mt-3 flex flex-col gap-2"></div>
+              </div>
+
+              <div class="panel">
+                <h3 class="subtitulo font-pixel">RESUMEN</h3>
+                <div id="resumen" class="mt-2 texto-lcd"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Vista 3: Acerca de -->
+          <section id="vista-acerca" class="vista" aria-label="Acerca de" hidden>
+            <div class="vista__head">
+              <h2 class="lcd-titulo font-pixel">ACERCA DE</h2>
+            </div>
+            <div class="flex flex-col gap-4 p-3">
+              <div class="panel text-center">
+                <div class="lens lens--on mx-auto" aria-hidden="true"><span class="lens__glass"></span></div>
+                <h3 class="font-pixel mt-3" style="font-size:15px;line-height:1.5">POKÉDEX QR</h3>
+                <p class="texto-lcd">Atrapa a los 151 Pokémon de Kanto escaneando códigos QR.</p>
+                <p class="texto-lcd mt-2" style="opacity:.8">Proyecto final · Desarrollo de aplicaciones móviles</p>
+                <p class="font-pixel mt-3" style="font-size:10px;line-height:1.7">AUTORA</p>
+                <p class="autora">Maria Isabel Ceballos Girón</p>
+                <p class="texto-lcd" style="opacity:.75">Versión 1.0</p>
+              </div>
+
+              <div class="panel">
+                <h3 class="subtitulo font-pixel">CÓMO JUGAR</h3>
+                <ol class="pasos mt-3">
+                  <li><b>Busca un código QR.</b> Cada Pokémon tiene el suyo.</li>
+                  <li><b>Toca Escanear</b> y apunta la cámara al código.</li>
+                  <li><b>Lanza la bola</b> y espera el clic: ¡es tuyo!</li>
+                </ol>
+                <p class="texto-lcd mt-3">Formato del QR: <code class="codigo">pokemon:25</code> (del 1 al 151).</p>
+              </div>
+
+              <div class="panel">
+                <h3 class="subtitulo font-pixel">TECNOLOGÍAS</h3>
+                <div class="flex flex-wrap gap-2 mt-3">
+                  <span class="etq-tec">HTML5</span><span class="etq-tec">JavaScript</span><span class="etq-tec">Tailwind CSS</span>
+                  <span class="etq-tec">PokéAPI</span><span class="etq-tec">html5-qrcode</span><span class="etq-tec">localStorage</span>
+                  <span class="etq-tec">Service Worker</span><span class="etq-tec">PWA</span>
+                </div>
+              </div>
+
+              <div class="panel">
+                <h3 class="subtitulo font-pixel">AJUSTES</h3>
+                <div class="ajuste mt-3">
+                  <div>
+                    <p class="ajuste__nombre">Vibración</p>
+                    <p class="texto-lcd" style="opacity:.8">Al capturar (solo celulares).</p>
+                  </div>
+                  <button id="sw-vibracion" class="switch" role="switch" aria-checked="true" aria-label="Vibración"><span class="switch__perilla"></span></button>
+                </div>
+                <div id="bloque-instalar" class="mt-4">
+                  <button id="btn-instalar" class="btn btn--primario w-full" hidden>Instalar Pokédex</button>
+                  <p id="nota-instalar" class="texto-lcd"></p>
+                </div>
+                <button id="btn-borrar" class="btn btn--peligro w-full mt-4">Borrar mi colección</button>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- Detalles decorativos de la carcasa -->
+        <div class="bezel__deco" aria-hidden="true">
+          <i class="bezel__punto"></i><i class="bezel__punto bezel__punto--2"></i>
+          <span class="rejilla"><i></i><i></i><i></i><i></i></span>
+        </div>
+      </main>
+
+      <!-- Bottom Navigation Bar -->
+      <nav class="dock" aria-label="Navegación principal">
+        <button class="dock__btn is-activo" data-ir="pokedex" aria-current="page">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          <span>Pokédex</span>
+        </button>
+        <button class="dock__btn" data-ir="progreso">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" aria-hidden="true"><path d="M5 20V12M12 20V4M19 20v-9M2 21h20"/></svg>
+          <span>Progreso</span>
+        </button>
+        <button class="dock__btn" data-ir="acerca">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v.5"/></svg>
+          <span>Acerca de</span>
+        </button>
+      </nav>
+
+      <!-- Floating Action Button -->
+      <button id="fab" class="fab" aria-label="Escanear código QR para capturar un Pokémon">
+        <span class="fab__bola" aria-hidden="true"><i></i></span>
+        <span class="fab__texto font-pixel">ESCANEAR</span>
+      </button>
+    </div>
+
+    <!-- Capas -->
+
+    <!-- Bottom Sheet de detalle -->
+    <div id="sheet-fondo" class="sheet-fondo" hidden></div>
+    <section id="sheet" class="sheet" role="dialog" aria-modal="true" aria-label="Detalle del Pokémon" hidden>
+      <div id="sheet-agarre" class="sheet__agarre"><span class="sheet__asa"></span></div>
+      <button id="sheet-cerrar" class="sheet__cerrar" aria-label="Cerrar detalle">✕</button>
+      <div id="sheet-cuerpo" class="sheet__cuerpo"></div>
+    </section>
+
+    <!-- Escáner QR -->
+    <div id="escaner" class="overlay overlay--escaner" role="dialog" aria-modal="true" aria-labelledby="escaner-titulo" hidden>
+      <div class="escaner__top">
+        <button id="escaner-cerrar" class="icono-btn" aria-label="Cerrar escáner">✕</button>
+        <h2 id="escaner-titulo" class="font-pixel" style="font-size:13px">ESCÁNER QR</h2>
+      </div>
+      <div class="visor">
+        <div id="qr-lector"></div>
+        <div class="visor__marco" aria-hidden="true"><i></i><i></i><i></i><i></i><span class="visor__linea"></span></div>
+        <div id="visor-estado" class="visor__estado" hidden>
+          <p id="visor-icono" class="visor__icono" aria-hidden="true">📷</p>
+          <p id="visor-titulo" class="font-pixel" style="font-size:12px;line-height:1.7"></p>
+          <p id="visor-texto" class="texto-claro"></p>
+          <div class="flex flex-wrap justify-center gap-2 mt-1">
+            <button id="visor-reintentar" class="btn btn--primario">Reintentar</button>
+          </div>
+        </div>
+      </div>
+      <p id="escaner-ayuda" class="escaner__ayuda" aria-live="polite">Apunta la cámara al código QR de un Pokémon</p>
+      <div class="escaner__acciones">
+        <input id="qr-archivo-input" type="file" accept="image/*" class="sr-only">
+        <label for="qr-archivo-input" class="btn btn--claro">Subir imagen de QR</label>
+        <form id="form-prueba" class="form-prueba" hidden>
+          <input id="prueba-texto" type="text" placeholder="pokemon:25" autocomplete="off" aria-label="Texto del QR de prueba">
+          <button class="btn btn--primario" type="submit">Probar</button>
+        </form>
+      </div>
+      <div id="qr-archivo" class="sr-only"></div>
+    </div>
+
+    <!-- Consultando PokéAPI (carga / error) -->
+    <div id="consulta" class="overlay overlay--consulta" role="alertdialog" aria-modal="true" aria-labelledby="consulta-titulo" hidden>
+      <div id="consulta-carga" class="consulta__panel">
+        <div id="consulta-bola" class="consulta__bola" aria-hidden="true"></div>
+        <p id="consulta-titulo" class="font-pixel" style="font-size:13px;line-height:1.7">Consultando Pokédex...</p>
+        <p id="consulta-sub" class="texto-claro"></p>
+      </div>
+      <div id="consulta-error" class="consulta__panel" hidden>
+        <p class="visor__icono" aria-hidden="true">⚠️</p>
+        <p id="error-titulo" class="font-pixel" style="font-size:12px;line-height:1.7"></p>
+        <p id="error-texto" class="texto-claro"></p>
+        <div class="flex flex-wrap justify-center gap-2 mt-2">
+          <button id="error-reintentar" class="btn btn--primario">Reintentar</button>
+          <button id="error-cerrar" class="btn btn--claro">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Encuentro y captura -->
+    <div id="captura" class="overlay overlay--captura" role="dialog" aria-modal="true" aria-label="Captura de Pokémon" hidden>
+      <div id="escena" class="escena">
+        <div class="escena__rayos" aria-hidden="true"></div>
+        <div id="captura-info" class="info-poke"></div>
+        <div id="captura-suelo" class="escena__suelo" aria-hidden="true"></div>
+        <img id="captura-img" class="escena__pokemon is-silueta" alt="" crossorigin="anonymous" decoding="async">
+        <div id="captura-bola" class="escena__bola" hidden aria-hidden="true"><div class="bola__giro"></div></div>
+        <div id="captura-fx" class="escena__fx" aria-hidden="true"></div>
+        <div id="captura-flash" class="escena__flash" aria-hidden="true"></div>
+        <div id="captura-banner" class="banner-shiny" hidden>✨ ¡SHINY! ✨</div>
+      </div>
+      <div class="dialogo">
+        <p id="captura-texto" class="dialogo__texto" aria-live="polite"></p>
+        <div id="captura-acciones" class="dialogo__acciones"></div>
+      </div>
+    </div>
+
+    <!-- Modal para instalar la app -->
+    <div id="instalar" class="instalar" role="dialog" aria-modal="true" aria-labelledby="instalar-titulo" hidden>
+      <div class="instalar__tarjeta">
+        <div class="lens lens--on" aria-hidden="true"><span class="lens__glass"></span></div>
+        <h2 id="instalar-titulo" class="font-pixel">INSTALA LA POKÉDEX</h2>
+        <p class="instalar__texto">Ábrela como una app, a pantalla completa y sin conexión, directo desde tu pantalla de inicio.</p>
+        <ol id="instalar-pasos" class="instalar__pasos" hidden>
+          <li>Toca el botón <b>Compartir</b> de Safari.</li>
+          <li>Elige <b>Añadir a pantalla de inicio</b>.</li>
+          <li>Toca <b>Añadir</b>.</li>
+        </ol>
+        <div class="instalar__acciones">
+          <button id="instalar-si" class="btn btn--primario">Instalar Pokédex</button>
+          <button id="instalar-no" class="btn btn--claro">Ahora no</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Avisos (Toast / Snackbar) -->
+    <div id="toasts" class="toasts" aria-live="polite" aria-atomic="false"></div>
+
+    <!-- Arranque: la Pokébola se abre y aparece la Pokédex -->
+    <div id="splash" class="splash" aria-hidden="true">
+      <div class="splash__mitad splash__mitad--arriba"></div>
+      <div class="splash__mitad splash__mitad--abajo"></div>
+      <div class="splash__lente"><div class="lens lens--grande" id="splash-lente"><span class="lens__glass"></span></div></div>
+      <div class="splash__info">
+        <p id="splash-texto" class="font-pixel">INICIANDO POKÉDEX…</p>
+        <div class="splash__barra"><i id="splash-barra"></i></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="lib/html5-qrcode.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
